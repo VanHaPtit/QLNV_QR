@@ -13,7 +13,7 @@ public class User {
     private String passwordHash;
 
     @ManyToOne
-    private NhanVien nhanVien;
+    private Employee nhanVien;
 
     @ManyToOne
     private Role role;
@@ -26,7 +26,7 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-    public User(Long id, String username, String passwordHash, NhanVien nhanVien, Role role) {
+    public User(Long id, String username, String passwordHash, Employee nhanVien, Role role) {
         this.id = id;
         this.username = username;
         this.passwordHash = passwordHash;
@@ -58,11 +58,11 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-    public NhanVien getNhanVien() {
+    public Employee getNhanVien() {
         return nhanVien;
     }
 
-    public void setNhanVien(NhanVien nhanVien) {
+    public void setNhanVien(Employee nhanVien) {
         this.nhanVien = nhanVien;
     }
 

@@ -1,9 +1,9 @@
 package QLNV.Controller;
 
-import QLNV.Entity.ChamCongChiTiet;
-import QLNV.Entity.PhienDiemDanh;
-import QLNV.Repository.PhienDiemDanhRepository;
-import QLNV.Service.ChamCongChiTietService;
+import QLNV.Entity.AttendanceDetail;
+import QLNV.Entity.AttendanceSession;
+import QLNV.Repository.AttendanceSessionRepository;
+import QLNV.Service.AttendanceDetailService;
 import QLNV.Service.QRCodeGeneratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,14 +16,14 @@ import java.time.LocalDate;
 @CrossOrigin("*")
 public class AttendanceSessionController {
     @Autowired
-    private PhienDiemDanhRepository phienRepo;
+    private AttendanceSessionRepository phienRepo;
     @Autowired private QRCodeGeneratorService qrService;
 
     @Autowired
-    private ChamCongChiTietService chamCongService;
+    private AttendanceDetailService chamCongService;
     // Sếp bấm nút "Tạo phiên mới" gọi vào đây
     @PostMapping("/start")
-    public ResponseEntity<?> startSession(@RequestBody PhienDiemDanh config) {
+    public ResponseEntity<?> startSession(@RequestBody AttendanceSession config) {
         // Tắt các phiên cũ
         phienRepo.findAll().forEach(p -> { p.setDangHoatDong(false); phienRepo.save(p); });
 
@@ -41,7 +41,7 @@ public class AttendanceSessionController {
     @PostMapping("/scan")
     public ResponseEntity<?> employeeScan(@RequestParam Long nhanVienId, @RequestParam String token) {
         try {
-            ChamCongChiTiet result = chamCongService.quetMaDiemDanh(nhanVienId, token);
+            AttendanceDetail result = chamCongService.quetMaDiemDanh(nhanVienId, token);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -1,13 +1,13 @@
 package QLNV.Controller;
 
-import QLNV.Entity.NhanVien;
+import QLNV.Entity.Employee;
 import QLNV.Entity.Role;
 import QLNV.Entity.User;
 import QLNV.Entity.request.LoginRequest;
 import QLNV.Entity.request.SignupRequest;
 import QLNV.Entity.response.MessageResponse;
 import QLNV.Entity.response.UserInfoResponse;
-import QLNV.Repository.NhanVienRepository;
+import QLNV.Repository.EmployeeRepository;
 import QLNV.Repository.RoleRepository;
 import QLNV.Repository.UserRepository;
 import QLNV.Service.impl.UserDetailsImpl;
@@ -36,7 +36,7 @@ public class AuthController {
     AuthenticationManager authenticationManager;
 
     @Autowired
-    NhanVienRepository nhanVienRepository;
+    EmployeeRepository nhanVienRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -91,7 +91,7 @@ public class AuthController {
         User user = new User(signUpRequest.getUsername(), encoder.encode(signUpRequest.getPassword()));
 
         if (signUpRequest.getNhanVienId() != null) {
-            NhanVien nv = nhanVienRepository.findByMaNv(signUpRequest.getNhanVienId())
+            Employee nv = nhanVienRepository.findByMaNv(signUpRequest.getNhanVienId())
                     .orElseThrow(() -> new RuntimeException("Lỗi: Không tìm thấy nhân viên có mã: " + signUpRequest.getNhanVienId()));
             user.setNhanVien(nv);
         }

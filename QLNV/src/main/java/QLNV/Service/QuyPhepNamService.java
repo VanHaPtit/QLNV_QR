@@ -1,18 +1,18 @@
 package QLNV.Service;
 
-import QLNV.Entity.QuyPhepNam;
+import QLNV.Entity.AnnualLeave;
 
 import java.util.List;
 
 public interface QuyPhepNamService {
-    List<QuyPhepNam> getAll();
-    QuyPhepNam getById(Long id);
-    QuyPhepNam create(QuyPhepNam qpn);
-    QuyPhepNam update(Long id, QuyPhepNam qpn);
+    List<AnnualLeave> getAll();
+    AnnualLeave getById(Long id);
+    AnnualLeave create(AnnualLeave qpn);
+    AnnualLeave update(Long id, AnnualLeave qpn);
     void delete(Long id);
-    List<QuyPhepNam> findByNam(Integer nam);
+    List<AnnualLeave> findByNam(Integer nam);
 
-    List<QuyPhepNam> findByNhanVien(Long nhanVienId);
+    List<AnnualLeave> findByNhanVien(Long nhanVienId);
 
-    List<QuyPhepNam> findByNhanVienAndNam(Long nhanVienId, Integer nam);
+    List<AnnualLeave> findByNhanVienAndNam(Long nhanVienId, Integer nam);
 }
