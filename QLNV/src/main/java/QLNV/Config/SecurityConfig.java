@@ -21,7 +21,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import java.util.List;
 
 @Configuration
-@EnableMethodSecurity // Cho phép phân quyền bằng @PreAuthorize trong Controller
+@EnableMethodSecurity 
 public class SecurityConfig {
 
     @Autowired
@@ -57,7 +57,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // --- 5. CHUỖI BỘ LỌC BẢO MẬT (Security Filter Chain) ---
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -67,29 +67,27 @@ public class SecurityConfig {
                     config.setAllowedOrigins(List.of("http://localhost:5173"));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
-                    config.setAllowCredentials(true); // Quan trọng: Cho phép gửi JWT Cookie
+                    config.setAllowCredentials(true); 
                     return config;
                 }))
 
-                // Vô hiệu hóa CSRF vì chúng ta dùng Stateless JWT
+
                 .csrf(csrf -> csrf.disable())
 
-                // Xử lý lỗi 401 Unauthorized khi truy cập trái phép
+
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 
-                // Không tạo Session trên Server (Stateless)
+ 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // Phân quyền URL
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Cho phép Login/Register tự do
-                        .anyRequest().authenticated()               // Các API khác (Hợp đồng, Nhân viên...) phải đăng nhập
+                        .anyRequest().authenticated()               // Các API khác phải đăng nhập
                 );
 
-        // Đăng ký Provider xác thực
         http.authenticationProvider(authenticationProvider());
 
-        // Kiểm tra JWT Filter trước khi thực hiện các bước khác
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
