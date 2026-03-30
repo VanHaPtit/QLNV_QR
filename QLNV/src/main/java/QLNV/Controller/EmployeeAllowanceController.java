@@ -42,7 +42,7 @@ public class EmployeeAllowanceController {
         service.delete(id);
     }
 
-    // ======= TÌM KIẾM ==========
+
     @GetMapping("/hop-dong/{hopDongId}")
     public List<EmployeeAllowance> findByHopDong(@PathVariable Long hopDongId) {
         return service.findByHopDong(hopDongId);

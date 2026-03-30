@@ -1,5 +1,6 @@
 package QLNV.Service;
 
+import QLNV.DTO.response.PayrollResponse;
 import QLNV.Entity.MonthlyPayroll;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,22 +9,20 @@ import java.util.Optional;
 
 public interface MonthlyPayrollService {
 
-    List<MonthlyPayroll> getAll();
+    List<PayrollResponse> getAll();
 
-    Optional<MonthlyPayroll> getById(Long id);
+    Optional<PayrollResponse> getById(Long id);
 
-    MonthlyPayroll save(MonthlyPayroll bangLuongThang);
+    PayrollResponse save(MonthlyPayroll bangLuongThang);
 
-    MonthlyPayroll update(Long id, MonthlyPayroll data);
+    PayrollResponse update(Long id, MonthlyPayroll data);
 
     void delete(Long id);
 
-    List<MonthlyPayroll> findByNhanVien(Long nvId);
+    List<PayrollResponse> findByNhanVien(Long nvId);
 
-    List<MonthlyPayroll> findByThangNam(Integer thang, Integer nam);
+    List<PayrollResponse> findByNhanVienAndThangNam(Long nvId, Integer thang, Integer nam);
 
-    List<MonthlyPayroll> findByNhanVienAndThangNam(Long nvId, Integer thang, Integer nam);
-    public void importFromExcel(MultipartFile file) throws Exception ;
-
-
+    void importFromExcel(MultipartFile file) throws Exception;
+    public PayrollResponse calculateMonthlySalary(Long nvId, int thang, int nam) ;
 }

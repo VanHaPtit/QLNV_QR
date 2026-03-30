@@ -1,6 +1,7 @@
 package QLNV.Repository;
 
 import QLNV.Entity.AttendanceDetail;
+import QLNV.Entity.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
@@ -11,4 +12,5 @@ public interface AttendanceDetailRepository extends JpaRepository<AttendanceDeta
     List<AttendanceDetail> findByNhanVien_Id(Long nhanVienId);
 
     List<AttendanceDetail> findByNhanVien_IdAndNgay(Long nhanVienId, LocalDate ngay);
+    List<AttendanceDetail> findByNhanVien_IdAndNgayBetween(Long nhanVienId, LocalDate startDate, LocalDate endDate);
 }

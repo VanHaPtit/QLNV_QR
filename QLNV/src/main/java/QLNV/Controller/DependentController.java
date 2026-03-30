@@ -42,7 +42,6 @@ public class DependentController {
         service.delete(id);
     }
 
-    // ------- API tìm kiếm -------
     @GetMapping("/nhan-vien/{nvId}")
     public List<Dependent> findByNhanVien(@PathVariable Long nvId) {
         return service.findByNhanVien(nvId);

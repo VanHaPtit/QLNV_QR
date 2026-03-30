@@ -1,11 +1,12 @@
 package QLNV.Controller;
 
-import QLNV.Entity.LaborContract;
+import QLNV.DTO.request.LaborContractRequest;
+import QLNV.DTO.response.ApiResponse;
+import QLNV.DTO.response.LaborContractResponse;
 import QLNV.Service.LaborContractService;
-import com.fasterxml.jackson.databind.ObjectMapper; // Cần cái này để parse JSON
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +20,6 @@ public class LaborContractController {
 
     private final LaborContractService service;
 
-    // Inject ObjectMapper của Spring để chuyển String JSON thành Object Java
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -28,58 +28,50 @@ public class LaborContractController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> create(
-            @RequestPart("hopDong") String hopDongJson, // Nhận chuỗi JSON
-            @RequestPart(value = "file", required = false) MultipartFile file // Nhận file (có thể null)
-    ) {
-        try {
-            // Chuyển chuỗi JSON thành Object HopDongLaoDong
-            LaborContract hopDong = objectMapper.readValue(hopDongJson, LaborContract.class);
-
-            // Gọi service xử lý
-            LaborContract newHd = service.create(hopDong, file);
-            return ResponseEntity.ok(newHd);
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().body("Lỗi xử lý dữ liệu: " + e.getMessage());
-        }
-    }
-
-    // 2. PUT UPDATE
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> update(
-            @PathVariable Long id,
-            @RequestPart("hopDong") String hopDongJson,
+    public ApiResponse<LaborContractResponse> create(
+            @RequestPart("hopDong") String requestJson,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) {
         try {
-            LaborContract hopDong = objectMapper.readValue(hopDongJson, LaborContract.class);
-
-            LaborContract updatedHd = service.update(id, hopDong, file);
-            return ResponseEntity.ok(updatedHd);
+            LaborContractRequest request = objectMapper.readValue(requestJson, LaborContractRequest.class);
+            return ApiResponse.success(service.create(request, file));
         } catch (IOException e) {
-            return ResponseEntity.badRequest().body("Lỗi cập nhật: " + e.getMessage());
+            return ApiResponse.error(400, "Dữ liệu không hợp lệ: " + e.getMessage());
         }
     }
 
-    // --- Các API GET/DELETE giữ nguyên ---
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<LaborContractResponse> update(
+            @PathVariable Long id,
+            @RequestPart("hopDong") String requestJson,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
+        try {
+            LaborContractRequest request = objectMapper.readValue(requestJson, LaborContractRequest.class);
+            return ApiResponse.success(service.update(id, request, file));
+        } catch (IOException e) {
+            return ApiResponse.error(400, "Cập nhật thất bại: " + e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
-    public LaborContract getById(@PathVariable Long id) {
-        return service.getById(id);
+    public ApiResponse<LaborContractResponse> getById(@PathVariable Long id) {
+        return ApiResponse.success(service.getById(id));
     }
 
     @GetMapping
-    public List<LaborContract> getAll() {
-        return service.getAll();
+    public ApiResponse<List<LaborContractResponse>> getAll() {
+        return ApiResponse.success(service.getAll());
     }
 
     @GetMapping("/nhan-vien/{nhanVienId}")
-    public List<LaborContract> getByNhanVien(@PathVariable Long nhanVienId) {
-        return service.getByNhanVienId(nhanVienId);
+    public ApiResponse<List<LaborContractResponse>> getByNhanVien(@PathVariable Long nhanVienId) {
+        return ApiResponse.success(service.getByNhanVienId(nhanVienId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<String> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ApiResponse.success("Đã xóa hợp đồng thành công!");
     }
 }

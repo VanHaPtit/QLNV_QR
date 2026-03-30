@@ -1,6 +1,8 @@
 package QLNV.Controller;
 
 
+import QLNV.DTO.response.ApiResponse;
+import QLNV.DTO.response.AttendanceDetailResponse;
 import QLNV.Entity.AttendanceDetail;
 import QLNV.Service.AttendanceDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,56 +19,66 @@ public class AttendanceDetailController {
     @Autowired
     private AttendanceDetailService service;
 
-    // ✔ Get all
     @GetMapping
-    public ResponseEntity<List<AttendanceDetail>> getAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ApiResponse<List<AttendanceDetailResponse>> getAll() {
+        List<AttendanceDetailResponse> list = service.findAll();
+        return ApiResponse.success(list);
     }
 
-    // ✔ Get by ID
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        AttendanceDetail c = service.findById(id);
-        if (c == null) {
-            return ResponseEntity.badRequest().body("Không tìm thấy bản ghi!");
+    public ApiResponse<AttendanceDetailResponse> getById(@PathVariable Long id) {
+        AttendanceDetailResponse res = service.findById(id);
+        if (res == null) {
+            return ApiResponse.error(404, "Không tìm thấy bản ghi chấm công ID: " + id);
         }
-        return ResponseEntity.ok(c);
+        return ApiResponse.success(res);
     }
 
-    // ✔ Create
     @PostMapping
     public ResponseEntity<AttendanceDetail> create(@RequestBody AttendanceDetail c) {
         return ResponseEntity.ok(service.save(c));
     }
 
-    // ✔ Update
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody AttendanceDetail c) {
-        AttendanceDetail existing = service.findById(id);
-        if (existing == null) {
-            return ResponseEntity.badRequest().body("Không tồn tại bản ghi để cập nhật!");
+    public ApiResponse<AttendanceDetailResponse> update(
+            @PathVariable Long id,
+            @RequestBody AttendanceDetailResponse data) {
+        try {
+            AttendanceDetailResponse updated = service.update(id, data);
+            return ApiResponse.success(updated);
+        } catch (Exception e) {
+            return ApiResponse.error(400, "Cập nhật thất bại: " + e.getMessage());
         }
-
-        c.setId(id);
-        return ResponseEntity.ok(service.save(c));
     }
 
-    // ✔ Delete
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        AttendanceDetail existing = service.findById(id);
+    public ApiResponse<String> delete(@PathVariable Long id) {
+        AttendanceDetailResponse existing = service.findById(id);
         if (existing == null) {
-            return ResponseEntity.badRequest().body("Không có bản ghi để xóa!");
+            return ApiResponse.error(404, "Không có bản ghi để xóa!");
         }
-
         service.delete(id);
-        return ResponseEntity.ok("Đã xóa thành công!");
+        return ApiResponse.success("Đã xóa bản ghi chấm công thành công!");
     }
 
-    // ✔ Get theo nhân viên (optional)
     @GetMapping("/nhan-vien/{nhanVienId}")
-    public ResponseEntity<List<AttendanceDetail>> findByNhanVien(@PathVariable Long nhanVienId) {
-        return ResponseEntity.ok(service.findByNhanVienId(nhanVienId));
+    public ApiResponse<List<AttendanceDetailResponse>> findByNhanVien(@PathVariable Long nhanVienId) {
+        List<AttendanceDetailResponse> list = service.findByNhanVienId(nhanVienId);
+        return ApiResponse.success(list);
     }
+
+
+    @PostMapping("/scan")
+    public ApiResponse<AttendanceDetailResponse> scan(
+            @RequestParam Long nhanVienId,
+            @RequestParam String token) {
+        try {
+            AttendanceDetailResponse res = service.quetMaDiemDanh(nhanVienId, token);
+            return ApiResponse.success(res);
+        } catch (Exception e) {
+            return ApiResponse.error(400, e.getMessage());
+        }
+    }
+
 }
 

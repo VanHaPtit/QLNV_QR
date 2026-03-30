@@ -15,10 +15,10 @@ public class AttendanceSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalTime gioBatDauCauHinh;  // Giờ vào làm sếp quy định
-    private LocalTime gioKetThucCauHinh; // Giờ tan làm sếp quy định
+    private LocalTime gioBatDauCauHinh;
+    private LocalTime gioKetThucCauHinh;
     private LocalDate ngayTao;
-    private boolean dangHoatDong;        // Phiên nào đang chạy thì mã QR mới có hiệu lực
+    private boolean dangHoatDong;
 
     @Enumerated(EnumType.STRING)
     private DayType loaiNgay;

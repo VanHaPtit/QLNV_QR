@@ -14,7 +14,7 @@ import java.util.Objects;
 public class UserDetailsImpl implements UserDetails {
     private Long id;
     private String username;
-    private String fullName; // Thêm trường này để hiển thị trên React Header
+    private String fullName;
 
     private Long nhanVienId;
     @JsonIgnore
@@ -43,20 +43,17 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public static UserDetailsImpl build(User user) {
-        // Vì getRole() trả về 1 đối tượng, ta không dùng stream() mà tạo trực tiếp authority
         GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().getTenRole());
 
-        // Bọc authority vào một danh sách duy nhất (Singleton List)
         List<GrantedAuthority> authorities = Collections.singletonList(authority);
 
-        // Lấy tên thật từ NhanVien (nếu có), nếu không có thì dùng username
         String fullName = (user.getNhanVien() != null) ? user.getNhanVien().getHoTen() : user.getUsername();
 
         return new UserDetailsImpl(
                 user.getId(),
                 user.getUsername(),
                 fullName,
-                user.getPasswordHash(), // Khớp với trường passwordHash trong Entity của bạn
+                user.getPasswordHash(),
                 authorities);
     }
 

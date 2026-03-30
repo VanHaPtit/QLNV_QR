@@ -1,5 +1,6 @@
 package QLNV.Service;
 
+import QLNV.DTO.response.EmployeeResponse;
 import QLNV.Entity.Employee;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,14 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EmployeeService {
-
-    List<Employee> getAll();
-    Optional<Employee> getById(Long id);
-    Employee save(Employee nv, MultipartFile file) throws IOException;
-    Employee update(Long id, Employee nv, MultipartFile file) throws IOException;
+    List<EmployeeResponse> getAll();
+    Optional<EmployeeResponse> getById(Long id);
+    EmployeeResponse save(EmployeeResponse nvDto, MultipartFile file) throws IOException;
+    EmployeeResponse update(Long id, EmployeeResponse nvDto, MultipartFile file) throws IOException;
     void delete(Long id);
-
-    // Tìm kiếm
     Employee findByMaNv(String maNv);
 }
 

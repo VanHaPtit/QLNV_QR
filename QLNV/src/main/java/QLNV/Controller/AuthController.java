@@ -3,10 +3,10 @@ package QLNV.Controller;
 import QLNV.Entity.Employee;
 import QLNV.Entity.Role;
 import QLNV.Entity.User;
-import QLNV.Entity.request.LoginRequest;
-import QLNV.Entity.request.SignupRequest;
-import QLNV.Entity.response.MessageResponse;
-import QLNV.Entity.response.UserInfoResponse;
+import QLNV.DTO.request.LoginRequest;
+import QLNV.DTO.request.SignupRequest;
+import QLNV.DTO.response.MessageResponse;
+import QLNV.DTO.response.UserInfoResponse;
 import QLNV.Repository.EmployeeRepository;
 import QLNV.Repository.RoleRepository;
 import QLNV.Repository.UserRepository;
@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,33 +54,34 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+        );
 
+        // 2. Lưu thông tin xác thực vào Security Context của Spring
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        // 3. Lấy thông tin chi tiết người dùng sau khi đăng nhập thành công
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        // 1. Tạo Cookie chứa JWT (để dùng header Set-Cookie)
+        // 4. Tạo Cookie chứa JWT Token
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-
-        // 2. Lấy chuỗi JWT string từ Cookie hoặc tạo mới để gửi về Body
-        // Lưu ý: Nếu jwtUtils của bạn có hàm generateTokenFromUsername thì dùng hàm đó cho gọn
         String jwtToken = jwtCookie.getValue();
 
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
-
-        // 3. Trả về Body bao gồm chuỗi token để React lưu vào localStorage
+        List<String> roles = new ArrayList<>();
+        for (org.springframework.security.core.GrantedAuthority authority : userDetails.getAuthorities()) {
+            roles.add(authority.getAuthority());
+        }
+        UserInfoResponse responseBody = new UserInfoResponse(
+                jwtToken,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getFullName(),
+                roles
+        );
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(new UserInfoResponse(
-                        jwtToken,
-                        userDetails.getId(),
-                        userDetails.getUsername(),
-                        userDetails.getFullName(),
-                        roles));
+                .body(responseBody);
     }
 
     @PostMapping("/signup")

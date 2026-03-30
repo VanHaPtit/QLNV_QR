@@ -1,4 +1,4 @@
-package QLNV.Entity.response;
+package QLNV.DTO.response;
 
 public class MessageResponse {
     private String message;

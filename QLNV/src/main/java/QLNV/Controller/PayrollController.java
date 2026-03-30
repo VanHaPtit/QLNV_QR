@@ -1,15 +1,15 @@
 package QLNV.Controller;
 
+import QLNV.DTO.response.ApiResponse;
+import QLNV.DTO.response.PayrollResponse;
 import QLNV.Entity.MonthlyPayroll;
 import QLNV.Service.MonthlyPayrollService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bangluong")
@@ -20,67 +20,73 @@ public class PayrollController {
     private MonthlyPayrollService service;
 
     @GetMapping("/all")
-    public List<MonthlyPayroll> getAll() {
-        return service.getAll();
+    public ApiResponse<List<PayrollResponse>> getAll() {
+        return ApiResponse.success(service.getAll());
+    }
+
+
+    @PostMapping("/calculate")
+    public ApiResponse<PayrollResponse> calculateSalary(
+            @RequestParam Long nvId,
+            @RequestParam Integer thang,
+            @RequestParam Integer nam) {
+        try {
+            PayrollResponse result = service.calculateMonthlySalary(nvId, thang, nam);
+            return ApiResponse.success(result);
+        } catch (Exception e) {
+            return ApiResponse.error(400, "Lỗi tính lương: " + e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
-    public MonthlyPayroll getById(@PathVariable Long id) {
-        return service.getById(id).orElse(null);
+    public ApiResponse<PayrollResponse> getById(@PathVariable Long id) {
+        Optional<PayrollResponse> payrollOpt = service.getById(id);
+        if (payrollOpt.isPresent()) {
+            PayrollResponse data = payrollOpt.get();
+            return ApiResponse.success(data);
+        } else {
+            return ApiResponse.error(404, "Không tìm thấy bản ghi lương ID: " + id);
+        }
     }
 
     @PostMapping("/create")
-    public MonthlyPayroll create(@RequestBody MonthlyPayroll bangLuongThang) {
-        return service.save(bangLuongThang);
-    }
-
-    @PostMapping("/upload")
-    public ResponseEntity<?> importExcel(@RequestParam("file") MultipartFile file) {
-        // 1. Kiểm tra file trống
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body("Vui lòng chọn một file Excel để tải lên.");
-        }
-
-        try {
-            // 2. Gọi service xử lý (Hàm này có throws Exception nên cần nằm trong try)
-            service.importFromExcel(file);
-
-            // 3. Trả về thành công
-            return ResponseEntity.ok(Map.of(
-                    "message", "Import dữ liệu bảng lương thành công!",
-                    "fileName", file.getOriginalFilename()
-            ));
-
-        } catch (Exception e) {
-            // 4. Xử lý khi có lỗi xảy ra trong quá trình đọc file hoặc lưu DB
-            e.printStackTrace(); // In lỗi ra console để debug
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Lỗi hệ thống khi xử lý file: " + e.getMessage());
-        }
+    public ApiResponse<PayrollResponse> create(@RequestBody MonthlyPayroll data) {
+        return ApiResponse.success(service.save(data));
     }
 
     @PutMapping("/update/{id}")
-    public MonthlyPayroll update(@PathVariable Long id, @RequestBody MonthlyPayroll data) {
-        return service.update(id, data);
+    public ApiResponse<PayrollResponse> update(@PathVariable Long id, @RequestBody MonthlyPayroll data) {
+        try {
+            return ApiResponse.success(service.update(id, data));
+        } catch (Exception e) {
+            return ApiResponse.error(400, e.getMessage());
+        }
     }
 
     @DeleteMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public ApiResponse<String> delete(@PathVariable Long id) {
         service.delete(id);
-        return "Deleted!";
+        return ApiResponse.success("Đã xóa bảng lương thành công!");
     }
 
-    @GetMapping("/nv/{nvId}")
-    public List<MonthlyPayroll> getByNhanVien(@PathVariable Long nvId) {
-        return service.findByNhanVien(nvId);
+    @PostMapping("/upload")
+    public ApiResponse<String> importExcel(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) return ApiResponse.error(400, "Vui lòng chọn file Excel!");
+        try {
+            service.importFromExcel(file);
+            return ApiResponse.success("Import dữ liệu bảng lương thành công!");
+        } catch (Exception e) {
+            return ApiResponse.error(500, "Lỗi hệ thống: " + e.getMessage());
+        }
     }
 
     @GetMapping("/filter")
-    public List<MonthlyPayroll> filter(
+    public ApiResponse<List<PayrollResponse>> filter(
             @RequestParam(required = false) Long nvId,
             @RequestParam Integer thang,
             @RequestParam Integer nam
     ) {
-        return service.findByNhanVienAndThangNam(nvId, thang, nam);
+        List<PayrollResponse> result = service.findByNhanVienAndThangNam(nvId, thang, nam);
+        return ApiResponse.success(result);
     }
 }

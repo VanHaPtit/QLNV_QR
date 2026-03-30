@@ -1,5 +1,6 @@
 package QLNV.Service.impl;
 
+import QLNV.DTO.response.LeaveRequestResponse;
 import QLNV.Entity.LeaveRequest;
 import QLNV.Entity.Enum.RequestStatus;
 import QLNV.Entity.Employee;
@@ -67,9 +68,6 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         return repo.findByTrangThai(status);
     }
 
-    // ==========================
-    // CHỨC NĂNG DUYỆT ĐƠN
-    // ==========================
 
     @Override
     public LeaveRequest approveDon(Long id, Long nguoiDuyetId) {
@@ -96,4 +94,20 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
         return repo.save(don);
     }
+
+    private LeaveRequestResponse mapToLeaveResponse(LeaveRequest don) {
+        LeaveRequestResponse res = new LeaveRequestResponse();
+        res.setId(don.getId());
+        res.setLoaiNghi(don.getLoaiNghi().name());
+        res.setTuNgay(don.getTuNgay());
+        res.setDenNgay(don.getDenNgay());
+        res.setTrangThai(don.getTrangThai().name());
+
+        if (don.getNguoiDuyet() != null) {
+            res.setTenNguoiDuyet(don.getNguoiDuyet().getHoTen());
+        }
+
+        return res;
+    }
+
 }

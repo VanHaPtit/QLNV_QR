@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AnnualLeaveRepository extends JpaRepository<AnnualLeave, Long> {
@@ -15,5 +16,5 @@ public interface AnnualLeaveRepository extends JpaRepository<AnnualLeave, Long> 
     List<AnnualLeave> findByNhanVienId(Long nhanVienId);
 
     // Tìm theo nhân viên và năm
-    List<AnnualLeave> findByNhanVienIdAndNam(Long nhanVienId, Integer nam);
+    Optional<AnnualLeave> findByNhanVienIdAndNam(Long nhanVienId, Integer nam);
 }

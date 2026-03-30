@@ -1,4 +1,4 @@
-package QLNV.Entity.request;
+package QLNV.DTO.request;
 
 import jakarta.validation.constraints.NotBlank;
 

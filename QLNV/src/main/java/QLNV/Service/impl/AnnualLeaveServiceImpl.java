@@ -6,6 +6,7 @@ import QLNV.Service.QuyPhepNamService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AnnualLeaveServiceImpl implements QuyPhepNamService {
@@ -62,7 +63,7 @@ public class AnnualLeaveServiceImpl implements QuyPhepNamService {
 
     @Override
     public List<AnnualLeave> findByNhanVienAndNam(Long nhanVienId, Integer nam) {
-        return repository.findByNhanVienIdAndNam(nhanVienId, nam);
+        return repository.findByNhanVienIdAndNam(nhanVienId, nam).stream().collect(Collectors.toList());
     }
 
 }

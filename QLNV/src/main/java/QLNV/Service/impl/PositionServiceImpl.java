@@ -38,13 +38,15 @@ public class PositionServiceImpl implements PositionService {
 
     @Override
     public Position updateChucVu(Long id, Position data) {
-        return chucVuRepository.findById(id)
-                .map(cv -> {
-                    cv.setTenChucVu(data.getTenChucVu());
-                    cv.setCapBac(data.getCapBac());
-                    return chucVuRepository.save(cv);
-                })
-                .orElse(null);
+        Optional<Position> cvOpt = chucVuRepository.findById(id);
+        if (cvOpt.isPresent()) {
+            Position cv = cvOpt.get();
+            cv.setTenChucVu(data.getTenChucVu());
+            cv.setCapBac(data.getCapBac());
+            return chucVuRepository.save(cv);
+        } else {
+            return null;
+        }
     }
 
     @Override
